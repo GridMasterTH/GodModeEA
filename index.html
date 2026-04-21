@@ -10,17 +10,18 @@
         .card { background-color: #131323; border: 1px solid #4646e6; border-top: 4px solid #4646e6; }
         .input-field { background-color: #1a1a2e; border: 1px solid #3f3f5f; color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 14px; }
         .input-field:focus { border-color: #6366f1; outline: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 700px; }
         th { background-color: #181838; color: #a0a0ff; text-align: left; padding: 12px; font-size: 13px; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #2a2a4a; font-size: 14px; }
         tr:hover { background-color: #1c1c3c; }
         .warning { color: #ff5050; font-weight: bold; }
         .safe { color: #00dc78; }
-        .label-text { display: block; text-sm; margin-bottom: 4px; color: #94a3b8; }
+        .label-text { display: block; font-size: 12px; margin-bottom: 4px; color: #94a3b8; }
+        .blown-row { background-color: rgba(127, 29, 29, 0.4) !important; }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         <h1 class="text-3xl font-bold mb-6 text-center text-blue-400">⚡ GOD MODE EA v2.0 Calculator</h1>
         
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -32,6 +33,24 @@
                         <label class="label-text">Balance ($)</label>
                         <input type="number" id="balance" value="1000" class="input-field" oninput="calculate()">
                     </div>
+
+                    <div class="pt-2 border-t border-gray-800">
+                        <label class="label-text font-bold text-yellow-500">Price & Direction</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="label-text">Entry Price</label>
+                                <input type="number" id="entryPrice" value="2300" step="0.01" class="input-field" oninput="calculate()">
+                            </div>
+                            <div>
+                                <label class="label-text">Direction</label>
+                                <select id="direction" class="input-field" onchange="calculate()">
+                                    <option value="buy">BUY (ลากลง)</option>
+                                    <option value="sell">SELL (ลากขึ้น)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="label-text">Start Lot</label>
@@ -52,7 +71,7 @@
                     </div>
 
                     <div class="pt-4 border-t border-gray-800">
-                        <p class="text-xs text-yellow-500 mb-2 font-bold">ข้อมูลจาก Specification ใน MT5:</p>
+                        <p class="text-xs text-blue-400 mb-2 font-bold">MT5 Specification:</p>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="label-text text-xs">Contract Size</label>
@@ -76,7 +95,8 @@
                                 <th>Order</th>
                                 <th>Lot Size</th>
                                 <th>Total Lot</th>
-                                <th>Distance (Pts)</th>
+                                <th>Price Level</th>
+                                <th>Distance</th>
                                 <th>Floating Loss</th>
                                 <th>Drawdown %</th>
                             </tr>
@@ -95,8 +115,9 @@
             const multiplier = parseFloat(document.getElementById('multiplier').value) || 0;
             const baseStep = parseFloat(document.getElementById('baseStep').value) || 0;
             const maxOrders = parseInt(document.getElementById('maxOrders').value) || 0;
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value) || 0;
+            const direction = document.getElementById('direction').value;
             
-            // สูตรคำนวณตาม MT5
             const contractSize = parseFloat(document.getElementById('contractSize').value) || 0;
             const pointSize = parseFloat(document.getElementById('pointSize').value) || 0;
             const pointValuePerLot = contractSize * pointSize;
@@ -111,7 +132,6 @@
                 currentLot = Math.round(currentLot * 100) / 100;
                 
                 if (i > 1) {
-                    // การลาก 1 Step กระทบกับทุก Lot ที่เปิดอยู่ก่อนหน้า
                     totalLoss += (totalLots * baseStep * pointValuePerLot);
                     currentDistance += baseStep;
                 }
@@ -119,22 +139,31 @@
                 totalLots += currentLot;
                 totalLots = Math.round(totalLots * 100) / 100;
                 
+                // คำนวณราคาที่ตำแหน่งไม้นั้นๆ
+                let currentPrice;
+                if (direction === 'buy') {
+                    currentPrice = entryPrice - (currentDistance * pointSize);
+                } else {
+                    currentPrice = entryPrice + (currentDistance * pointSize);
+                }
+
                 const ddPercent = balance > 0 ? (totalLoss / balance) * 100 : 0;
                 const isBlown = ddPercent >= 100;
                 const statusClass = ddPercent > 80 ? 'warning' : (ddPercent > 30 ? 'text-yellow-500' : 'safe');
 
                 tableBody += `
-                    <tr class="${isBlown ? 'bg-red-950/40' : ''}">
+                    <tr class="${isBlown ? 'blown-row' : ''}">
                         <td class="font-bold text-gray-400">#${i}</td>
                         <td>${currentLot.toFixed(2)}</td>
                         <td>${totalLots.toFixed(2)}</td>
-                        <td>${currentDistance.toLocaleString()}</td>
+                        <td class="text-blue-200 font-mono">${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 3})}</td>
+                        <td>${currentDistance.toLocaleString()} pts</td>
                         <td class="${statusClass}">-$${totalLoss.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                         <td class="${statusClass}">${ddPercent.toFixed(2)}%</td>
                     </tr>
                 `;
 
-                if (totalLoss > balance * 2) break; 
+                if (totalLoss > balance * 3) break; 
             }
             document.getElementById('tableBody').innerHTML = tableBody;
         }
