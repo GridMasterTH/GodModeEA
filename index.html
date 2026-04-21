@@ -3,189 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOD MODE EA - Ultimate Terminal v3.0</title>
+    <title>GOD MODE EA - TradingView Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
-        
         :root {
-            --bg-color: #020617;
-            --card-bg: rgba(15, 23, 42, 0.85);
-            --neon-blue: #38bdf8;
-            --neon-purple: #818cf8;
-            --neon-red: #f43f5e;
-            --neon-green: #10b981;
+            --tv-bg: #131722;
+            --tv-card: #1e222d;
+            --tv-border: #363a45;
+            --tv-blue: #2962ff;
+            --tv-red: #f23645;
+            --tv-green: #089981;
+            --tv-text: #d1d4dc;
         }
 
-        body { 
-            background: radial-gradient(circle at top right, #1e1b4b, #020617);
-            color: #f1f5f9; 
-            font-family: 'Rajdhani', sans-serif;
-            min-height: 100vh;
+        body {
+            background-color: var(--tv-bg);
+            color: var(--tv-text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        .orbitron { font-family: 'Orbitron', sans-serif; }
-        
-        .glass-card { 
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
-            border-radius: 16px;
+        .tv-card {
+            background-color: var(--tv-card);
+            border: 1px solid var(--tv-border);
+            border-radius: 8px;
         }
 
-        .neon-border-blue { border-top: 3px solid var(--neon-blue); box-shadow: 0 -5px 20px -10px var(--neon-blue); }
-
-        .input-terminal {
-            background: #020617;
-            border: 1px solid #334155;
-            color: var(--neon-blue);
-            font-family: monospace;
-            transition: all 0.2s;
+        .tv-input {
+            background-color: #2a2e39;
+            border: 1px solid var(--tv-border);
+            color: white;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 14px;
+            transition: border-color 0.2s;
         }
-        .input-terminal:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+
+        .tv-input:focus {
+            border-color: var(--tv-blue);
             outline: none;
         }
 
-        .cell-input {
-            background: rgba(56, 189, 248, 0.05);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            color: #fff;
-            padding: 3px 8px;
-            border-radius: 4px;
-            width: 100px;
-            text-align: right;
-            font-family: monospace;
-            font-size: 13px;
+        .tv-table-header {
+            background-color: var(--tv-card);
+            border-bottom: 1px solid var(--tv-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .candle-red { background: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); width: 10px; border-radius: 2px; }
-        
-        .danger-row { background: rgba(244, 63, 94, 0.1) !important; border-left: 4px solid var(--neon-red); }
+        .tv-row {
+            border-bottom: 1px solid #2a2e39;
+            transition: background-color 0.1s;
+        }
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .tv-row:hover {
+            background-color: #2a2e39;
+        }
+
+        .stat-box {
+            padding: 16px;
+            border-right: 1px solid var(--tv-border);
+        }
+
+        .stat-box:last-child { border-right: none; }
+
+        .btn-reset {
+            background-color: #2a2e39;
+            color: #b2b5be;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: #363a45;
+            color: white;
+        }
+
+        .badge-danger { background-color: rgba(242, 54, 69, 0.2); color: var(--tv-red); padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+        
+        /* สไตล์ตารางกรอกราคา */
+        .price-edit {
+            width: 100px;
+            background: #131722;
+            border: 1px solid #363a45;
+            text-align: right;
+            padding: 2px 5px;
+            color: #2962ff;
+            font-family: monospace;
+            font-weight: bold;
+        }
     </style>
 </head>
-<body class="p-4 overflow-x-hidden">
+<body>
 
-    <div class="max-w-[1750px] mx-auto mb-6 flex flex-col md:flex-row justify-between items-end border-b border-slate-800 pb-4 gap-4">
-        <div>
-            <h1 class="orbitron text-4xl font-bold tracking-tighter text-white">
-                <span class="text-sky-400">GOD MODE</span> <span class="text-slate-500 font-light italic text-2xl">HYPER-TERMINAL</span>
-            </h1>
-            <p class="text-slate-500 text-xs mt-1 uppercase tracking-[0.4em] font-medium">Slippage & Retrace Real-time Engine</p>
-        </div>
-        <div class="grid grid-cols-2 gap-8">
-            <div class="text-right">
-                <p class="text-[10px] text-slate-500 uppercase font-bold">Calculation Mode</p>
-                <p class="text-sm text-sky-400 orbitron">LIVE GRID DEPTH</p>
+    <div class="flex flex-col h-screen">
+        <div class="tv-card m-4 flex flex-wrap shadow-lg">
+            <div class="stat-box flex-1 min-w-[150px]">
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Account Balance</p>
+                <p id="sumBalance" class="text-xl font-bold text-white">$0.00</p>
             </div>
-            <div class="text-right border-l border-slate-700 pl-8">
-                <p class="text-[10px] text-slate-500 uppercase font-bold">Latency Offset</p>
-                <p class="text-sm text-emerald-400 orbitron">ENABLED</p>
+            <div class="stat-box flex-1 min-w-[150px]">
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Max Survival</p>
+                <p id="sumSurvival" class="text-xl font-bold text-sky-400">0 Points</p>
+            </div>
+            <div class="stat-box flex-1 min-w-[150px]">
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">TP All Price</p>
+                <p id="sumTP" class="text-xl font-bold text-emerald-400">0.00</p>
+            </div>
+            <div class="stat-box flex-1 min-w-[150px]">
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider text-red-500">Break-Even Price</p>
+                <p id="sumBE" class="text-xl font-bold text-slate-300">0.00</p>
             </div>
         </div>
-    </div>
 
-    <div class="max-w-[1750px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <div class="lg:col-span-3 space-y-6">
-            <div class="glass-card p-6 neon-border-blue">
-                <h3 class="orbitron text-xs font-bold text-sky-400 mb-6 flex items-center gap-2">
-                    <span class="w-2 h-2 bg-sky-400 rounded-full animate-ping"></span> TERMINAL INPUTS
-                </h3>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Account Balance ($)</label>
-                        <input type="number" id="balance" value="6214" class="input-terminal w-full p-2.5 rounded-lg" oninput="calculate()">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 pb-4 overflow-hidden">
+            
+            <div class="lg:col-span-3 space-y-4 overflow-y-auto pr-2">
+                <div class="tv-card p-5">
+                    <h2 class="text-sm font-bold mb-4 text-white uppercase tracking-wider flex justify-between items-center">
+                        Market Settings
+                        <span class="text-[10px] bg-blue-600 px-2 py-0.5 rounded">LIVE</span>
+                    </h2>
+                    
+                    <div class="space-y-4">
                         <div>
-                            <label class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Start Lot</label>
-                            <input type="number" id="startLot" value="0.01" step="0.01" class="input-terminal w-full p-2.5 rounded-lg text-center" oninput="calculate()">
+                            <label class="text-[11px] text-slate-500 block mb-1">Balance ($)</label>
+                            <input type="number" id="balance" value="6214" class="tv-input w-full" oninput="calculate()">
                         </div>
-                        <div>
-                            <label class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Multiplier</label>
-                            <input type="number" id="multiplier" value="1.3" step="0.1" class="input-terminal w-full p-2.5 rounded-lg text-center" oninput="calculate()">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Base Step (Pts)</label>
-                            <input type="number" id="baseStep" value="700" class="input-terminal w-full p-2.5 rounded-lg text-center" oninput="calculate()">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-emerald-500 uppercase font-bold block mb-1">Profit Target ($)</label>
-                            <input type="number" id="targetProfit" value="5.0" class="input-terminal w-full p-2.5 rounded-lg text-center border-emerald-900" oninput="calculate()">
-                        </div>
-                    </div>
-                    <div class="pt-4 border-t border-slate-800">
-                        <label class="text-[10px] text-indigo-400 uppercase font-bold block mb-2 italic">MT5 Specification</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="contractSize" value="100" class="input-terminal w-full p-2 rounded text-center text-xs" oninput="calculate()">
-                            <input type="number" id="pointSize" value="0.01" step="0.001" class="input-terminal w-full p-2 rounded text-center text-xs" oninput="calculate()">
+                            <div>
+                                <label class="text-[11px] text-slate-500 block mb-1">Start Lot</label>
+                                <input type="number" id="startLot" value="0.01" step="0.01" class="tv-input w-full" oninput="calculate()">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-500 block mb-1">Multiplier</label>
+                                <input type="number" id="multiplier" value="1.3" step="0.1" class="tv-input w-full" oninput="calculate()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[11px] text-slate-500 block mb-1">Base Step (Pts)</label>
+                                <input type="number" id="baseStep" value="700" class="tv-input w-full" oninput="calculate()">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-emerald-500 block mb-1 font-bold">Target Profit ($)</label>
+                                <input type="number" id="targetProfit" value="5.0" class="tv-input w-full border-emerald-900" oninput="calculate()">
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-slate-700">
+                            <label class="text-[11px] text-slate-500 block mb-2 uppercase font-bold">Contract Specification</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="number" id="contractSize" value="100" class="tv-input w-full text-xs" oninput="calculate()">
+                                <input type="number" id="pointSize" value="0.01" step="0.001" class="tv-input w-full text-xs" oninput="calculate()">
+                            </div>
+                        </div>
+
+                        <button onclick="resetPrices()" class="btn-reset w-full">RESET SLIPPAGE PRICES</button>
+                    </div>
+                </div>
+
+                <div class="tv-card p-4 bg-[#1e222d]/50">
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        <span class="text-yellow-500 font-bold">💡 Tip:</span> 
+                        กรอกราคาเปิดจริงในช่อง <span class="text-blue-400">Entry Price</span> หากไม้ใน MT5 ไหล (Slippage) เพื่อคำนวณ Drawdown และจุดหนีตายที่แม่นยำที่สุด
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-9 flex flex-col gap-4 overflow-hidden">
+                
+                <div class="tv-card p-4 h-[300px]">
+                    <div class="flex justify-between items-center mb-2 px-2">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Exponential Floating Loss Analysis</h3>
+                        <div class="flex gap-4 text-[10px]">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-blue-500 rounded-full"></span> Floating Loss ($)</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full"></span> Drawdown %</span>
                         </div>
                     </div>
-                    <button onclick="resetPrices()" class="w-full bg-slate-900 hover:bg-slate-800 text-[10px] text-slate-500 py-3 rounded-lg border border-slate-800 transition-all font-bold uppercase tracking-widest">↺ Clear Manual Prices</button>
-                </div>
-            </div>
-
-            <div class="glass-card p-4 h-[250px]">
-                <canvas id="lossChart"></canvas>
-            </div>
-        </div>
-
-        <div class="lg:col-span-7 space-y-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="glass-card p-4 text-center border-b-2 border-sky-500/50">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Liquidation Point</p>
-                    <p id="totalSurvival" class="orbitron text-xl text-white">#0</p>
-                </div>
-                <div class="glass-card p-4 text-center border-b-2 border-emerald-500/50">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">TP Retrace (Pts)</p>
-                    <p id="retraceTP" class="orbitron text-xl text-emerald-400">0</p>
-                </div>
-                <div class="glass-card p-4 text-center border-b-2 border-slate-500/50">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">BE Retrace (Pts)</p>
-                    <p id="retraceBE" class="orbitron text-xl text-slate-300">0</p>
-                </div>
-                <div class="glass-card p-4 text-center border-b-2 border-rose-500/50">
-                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Target TP Price</p>
-                    <p id="finalTP" class="orbitron text-xl text-rose-400">0.00</p>
-                </div>
-            </div>
-
-            <div class="glass-card overflow-hidden">
-                <div class="overflow-x-auto h-[600px]">
-                    <table class="w-full text-center border-collapse">
-                        <thead class="sticky top-0 bg-slate-950 text-slate-500 text-[10px] z-20 border-b border-slate-800">
-                            <tr>
-                                <th class="p-4">ORD</th>
-                                <th class="p-4">LOT</th>
-                                <th class="p-4 text-sky-400">ENTRY PRICE (EDIT)</th>
-                                <th class="p-4">AVG PRICE (BE)</th>
-                                <th class="p-4 text-emerald-400 italic font-bold">TP PRICE</th>
-                                <th class="p-4 text-emerald-400">TP RETRACE</th>
-                                <th class="p-4">DD %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="lg:col-span-2">
-            <div class="glass-card h-full p-4 flex flex-col items-center">
-                <h3 class="orbitron text-[10px] font-bold text-slate-500 mb-6 uppercase tracking-widest">Battle Map</h3>
-                <div id="visualGrid" class="relative w-full flex-grow flex flex-col items-center py-6 overflow-y-auto overflow-x-hidden">
+                    <div class="relative h-full pb-8">
+                        <canvas id="riskChart"></canvas>
                     </div>
+                </div>
+
+                <div class="tv-card flex-1 overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto overflow-y-auto">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead class="tv-table-header text-[10px] text-slate-500 uppercase font-bold">
+                                <tr>
+                                    <th class="p-3">Order</th>
+                                    <th class="p-3">Lot</th>
+                                    <th class="p-3 text-blue-400">Entry Price (Edit)</th>
+                                    <th class="p-3">Avg Price (BE)</th>
+                                    <th class="p-3 text-emerald-400 font-bold">TP Price ($)</th>
+                                    <th class="p-3">Retrace (Pts)</th>
+                                    <th class="p-3 text-center">Drawdown %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -204,147 +231,172 @@
             const pointValuePerLot = contractSize * pointSize;
 
             let tableBody = '';
-            let gridHTML = '';
-            let totalLots = 0;
-            let sumLotPriceValue = 0;
-            let totalLoss = 0;
-            let currentPrice = 0;
-            let chartData = [];
+            let chartLabels = [];
+            let chartLossData = [];
+            let chartDDData = [];
             
-            let lastSurvival = 0, lastTPPrice = 0, lastBEPrice = 0, lastRetraceTP = 0, lastRetraceBE = 0;
+            let totalLots = 0;
+            let sumPriceLot = 0;
+            let totalLoss = 0;
+            let currentPrice = 2300; // Default base
+
+            // Stats for summary
+            let lastSafeSurvival = 0;
+            let lastSafeTP = 0;
+            let lastSafeBE = 0;
 
             for (let i = 1; i <= 30; i++) {
                 let currentLot = startLot * Math.pow(multiplier, i - 1);
                 currentLot = Math.round(currentLot * 100) / 100;
 
-                // Price logic with Slippage support
+                // Handle Entry Price
                 if (manualPrices[i]) {
                     currentPrice = manualPrices[i];
-                } else {
-                    if (i === 1) {
-                        currentPrice = 2300; // Standard Start
-                    } else {
-                        currentPrice = currentPrice - (baseStep * pointSize);
-                    }
+                } else if (i > 1) {
+                    currentPrice = currentPrice - (baseStep * pointSize);
                 }
 
-                // Accurate DD Calculation based on Entry Prices
-                let tempSumPrice = 0;
+                // Recalculate floating loss at this specific price point
+                let tempLoss = 0;
                 let tempTotalLot = 0;
-                let tempTotalLoss = 0;
-
+                let tempSumPriceLot = 0;
+                
                 for(let j=1; j<=i; j++) {
                     let jLot = startLot * Math.pow(multiplier, j - 1);
                     jLot = Math.round(jLot * 100) / 100;
-                    // Find actual price of j
+                    
+                    // Get price of previous orders
                     let jPrice = manualPrices[j];
                     if(!jPrice) {
-                        // Reconstruct auto price for j
                         let autoP = 2300;
                         for(let k=1; k<j; k++) {
                             autoP = manualPrices[k] ? manualPrices[k] - (baseStep * pointSize) : autoP - (baseStep * pointSize);
                         }
                         jPrice = autoP;
                     }
-                    tempTotalLoss += (jPrice - currentPrice) * jLot * contractSize;
+                    
+                    tempLoss += (jPrice - currentPrice) * jLot * contractSize;
                     tempTotalLot += jLot;
-                    tempSumPrice += (jPrice * jLot);
+                    tempSumPriceLot += (jPrice * jLot);
                 }
 
-                totalLots = tempTotalLot;
-                totalLoss = tempTotalLoss;
-                let avgPrice = tempSumPrice / totalLots;
-                let pointsToTP = targetProfit / (totalLots * pointValuePerLot);
-                let tpPrice = avgPrice + (pointsToTP * pointSize);
-                let retraceTP = (tpPrice - currentPrice) / pointSize;
-                let retraceBE = (avgPrice - currentPrice) / pointSize;
-                const ddPercent = (totalLoss / balance) * 100;
+                const avgPrice = tempSumPriceLot / tempTotalLot;
+                const tpDist = targetProfit / (tempTotalLot * pointValuePerLot);
+                const tpPrice = avgPrice + (tpDist * pointSize);
+                const ddPercent = (tempLoss / balance) * 100;
+                const retrace = (tpPrice - currentPrice) / pointSize;
 
-                chartData.push(totalLoss);
+                chartLabels.push(`Order ${i}`);
+                chartLossData.push(tempLoss.toFixed(2));
+                chartDDData.push(ddPercent.toFixed(1));
+
                 if (ddPercent <= 100) {
-                    lastSurvival = i; lastTPPrice = tpPrice; lastBEPrice = avgPrice;
-                    lastRetraceTP = retraceTP; lastRetraceBE = retraceBE;
+                    lastSafeSurvival = (i-1) * baseStep;
+                    lastSafeTP = tpPrice;
+                    lastSafeBE = avgPrice;
                 }
 
-                const isDanger = ddPercent >= 80;
-                const rowClass = ddPercent >= 100 ? 'danger-row' : '';
+                const isBlown = ddPercent >= 100;
+                const rowClass = isBlown ? 'bg-red-950/20 opacity-50' : 'tv-row';
 
                 tableBody += `
-                    <tr class="${rowClass} border-b border-slate-900/50">
-                        <td class="p-3 text-slate-500 orbitron text-[10px]">#${i.toString().padStart(2, '0')}</td>
-                        <td class="p-3 font-bold text-slate-200">${currentLot.toFixed(2)}</td>
+                    <tr class="${rowClass}">
+                        <td class="p-3 text-slate-500 font-bold">#${i}</td>
+                        <td class="p-3 font-bold text-white">${currentLot.toFixed(2)}</td>
                         <td class="p-3">
                             <input type="number" step="0.01" value="${currentPrice.toFixed(2)}" 
-                                onchange="updateManualPrice(${i}, this.value)" class="cell-input">
+                                onchange="updateManualPrice(${i}, this.value)" class="price-edit rounded">
                         </td>
-                        <td class="p-3 text-slate-400 font-mono text-xs">${avgPrice.toFixed(2)}</td>
-                        <td class="p-3 text-sky-400 font-bold font-mono">${tpPrice.toFixed(2)}</td>
-                        <td class="p-3 text-emerald-400 font-bold font-mono">${Math.round(retraceTP).toLocaleString()}</td>
-                        <td class="p-3 ${isDanger ? 'text-rose-500 font-bold' : 'text-slate-500'}">${ddPercent.toFixed(1)}%</td>
+                        <td class="p-3 text-slate-400 font-mono">${avgPrice.toFixed(2)}</td>
+                        <td class="p-3 text-emerald-400 font-bold font-mono">${tpPrice.toFixed(2)}</td>
+                        <td class="p-3 text-orange-400 font-mono">${Math.round(retrace).toLocaleString()}</td>
+                        <td class="p-3 text-center">
+                            <span class="${ddPercent > 80 ? 'badge-danger' : 'text-slate-300'}">
+                                ${ddPercent.toFixed(1)}%
+                            </span>
+                        </td>
                     </tr>
                 `;
 
-                // Logic for Battle Map (Visual Grid)
-                if (i <= 15) {
-                    const nextPrice = currentPrice - (baseStep * pointSize);
-                    const isTPHere = (lastTPPrice <= currentPrice && lastTPPrice >= nextPrice);
-                    const isBEHere = (lastBEPrice <= currentPrice && lastBEPrice >= nextPrice);
-
-                    gridHTML += `
-                        <div class="relative w-full flex flex-col items-center mb-1">
-                            <div class="h-2 w-px bg-slate-800"></div>
-                            <div class="candle-red h-8 w-2"></div>
-                            <div class="h-2 w-px bg-slate-800"></div>
-                            <div class="absolute right-0 top-1/2 w-12 border-t border-slate-800"></div>
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 text-[8px] text-slate-600 font-bold">ORD ${i}</span>
-                            
-                            ${isTPHere ? `<div class="absolute right-0 top-2 w-24 border-t-2 border-emerald-500 shadow-[0_0_10px_#10b981] z-10 animate-pulse"><span class="text-[7px] text-emerald-400 absolute -top-3 right-0 font-bold uppercase">TARGET TP ALL ⚡</span></div>` : ''}
-                            ${isBEHere ? `<div class="absolute right-0 top-6 w-24 border-t-2 border-slate-400 border-dashed z-0"><span class="text-[7px] text-slate-400 absolute -top-3 right-0 font-bold uppercase">BREAK EVEN</span></div>` : ''}
-                        </div>
-                    `;
-                }
-
-                if (totalLoss > balance * 3) break;
+                if (tempLoss > balance * 3) break;
             }
 
             document.getElementById('tableBody').innerHTML = tableBody;
-            document.getElementById('visualGrid').innerHTML = gridHTML;
-            document.getElementById('totalSurvival').innerText = `ORD #${lastSurvival}`;
-            document.getElementById('retraceTP').innerText = Math.round(lastRetraceTP).toLocaleString();
-            document.getElementById('retraceBE').innerText = Math.round(lastRetraceBE).toLocaleString();
-            document.getElementById('finalTP').innerText = lastTPPrice.toFixed(2);
-            document.getElementById('finalBE').innerText = lastBEPrice.toFixed(2);
-            updateChart(chartData);
+            document.getElementById('sumBalance').innerText = `$${balance.toLocaleString()}`;
+            document.getElementById('sumSurvival').innerText = `${lastSafeSurvival.toLocaleString()} Pts`;
+            document.getElementById('sumTP').innerText = lastSafeTP.toFixed(2);
+            document.getElementById('sumBE').innerText = lastSafeBE.toFixed(2);
+            
+            updateChart(chartLabels, chartLossData, chartDDData);
         }
 
         function updateManualPrice(idx, val) { manualPrices[idx] = parseFloat(val); calculate(); }
         function resetPrices() { manualPrices = {}; calculate(); }
 
-        function updateChart(data) {
-            const ctx = document.getElementById('lossChart').getContext('2d');
+        function updateChart(labels, lossData, ddData) {
+            const ctx = document.getElementById('riskChart').getContext('2d');
             if (myChart) myChart.destroy();
-            const grad = ctx.createLinearGradient(0, 0, 0, 200);
-            grad.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
-            grad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(41, 98, 255, 0.3)');
+            gradient.addColorStop(1, 'rgba(41, 98, 255, 0)');
 
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.map((_, i) => i + 1),
-                    datasets: [{
-                        data: data, borderColor: '#38bdf8', borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: grad, tension: 0.4
-                    }]
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Floating Loss ($)',
+                            data: lossData,
+                            borderColor: '#2962ff',
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#2962ff',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Drawdown (%)',
+                            data: ddData,
+                            borderColor: '#f23645',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            yAxisID: 'y1'
+                        }
+                    ]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { backgroundColor: '#1e222d', titleColor: '#94a3b8', bodyColor: '#fff', borderColor: '#363a45', borderWidth: 1 }
+                    },
                     scales: {
-                        x: { display: false },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#475569', font: { size: 8, family: 'Orbitron' } } }
+                        x: { grid: { display: false }, ticks: { color: '#4b5563', font: { size: 10 } } },
+                        y: { 
+                            position: 'left',
+                            grid: { color: '#2a2e39' },
+                            ticks: { color: '#2962ff', font: { size: 10 } }
+                        },
+                        y1: {
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#f23645', font: { size: 10 } },
+                            min: 0,
+                            max: 150
+                        }
                     }
                 }
             });
         }
+
+        // Init
         calculate();
     </script>
 </body>
