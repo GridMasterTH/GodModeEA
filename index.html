@@ -3,66 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOD MODE EA - Ultimate Calculator</title>
+    <title>GOD MODE EA - Hyper-Reality Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { background-color: #05050f; color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; }
-        .input-field { background: #0f172a; border: 1px solid #334155; color: #f1f5f9; padding: 10px; border-radius: 8px; width: 100%; transition: all 0.3s; font-size: 14px; }
-        .input-field:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-        .stat-label { color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-        th { text-transform: uppercase; font-size: 0.65rem; color: #94a3b8; padding: 12px; border-bottom: 2px solid #334155; }
-        td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
-        .danger-zone { background: rgba(239, 68, 68, 0.1) !important; color: #fca5a5; }
-        .highlight-blue { color: #60a5fa; font-weight: 700; }
+        body { background-color: #05050f; color: #f8fafc; font-family: 'Inter', sans-serif; font-size: 13px; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; }
+        .input-field { background: #0f172a; border: 1px solid #334155; color: #f1f5f9; padding: 6px 10px; border-radius: 6px; width: 100%; transition: all 0.2s; }
+        .input-field:focus { border-color: #6366f1; outline: none; ring: 1px solid #6366f1; }
+        .cell-input { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #fff; padding: 2px 5px; border-radius: 4px; width: 100px; text-align: right; font-family: monospace; }
+        .cell-input:focus { border-color: #6366f1; background: #0f172a; }
+        .stat-label { color: #94a3b8; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+        th { text-transform: uppercase; font-size: 0.6rem; color: #94a3b8; padding: 8px; border-bottom: 1px solid #334155; text-align: center; }
+        td { padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .danger-zone { background: rgba(239, 68, 68, 0.15) !important; color: #fca5a5; }
+        .highlight-tp { color: #60a5fa; font-weight: 700; }
+        .highlight-be { color: #94a3b8; font-style: italic; }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body class="p-2 md:p-6">
     <div class="max-w-[1600px] mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="md:col-span-1">
-                <h1 class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">⚡ GOD MODE EA</h1>
-                <p class="text-slate-500 text-xs uppercase tracking-widest">Martingale Retrace Analysis</p>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+            <div class="glass-card p-3 border-l-4 border-indigo-500">
+                <p class="stat-label">Liquidation Point</p>
+                <p id="totalSurvival" class="text-xl font-bold text-white font-mono">0</p>
             </div>
-            <div class="glass-card p-4 flex flex-col justify-center items-center border-b-2 border-emerald-500">
-                <p class="stat-label">Total Survival Points</p>
-                <p id="totalSurvival" class="stat-value text-emerald-400 text-2xl font-mono">0</p>
+            <div class="glass-card p-3 border-l-4 border-emerald-500">
+                <p class="stat-label">TP All Retrace (Pts)</p>
+                <p id="retraceTP" class="text-xl font-bold text-emerald-400 font-mono text-center">0</p>
             </div>
-            <div class="glass-card p-4 flex flex-col justify-center items-center border-b-2 border-orange-500">
-                <p class="stat-label">Recovery Retrace (Pts)</p>
-                <p id="retraceNeeded" class="stat-value text-orange-400 text-2xl font-mono">0</p>
+            <div class="glass-card p-3 border-l-4 border-slate-400">
+                <p class="stat-label text-slate-400">Break-Even Retrace (Pts)</p>
+                <p id="retraceBE" class="text-xl font-bold text-slate-300 font-mono text-center">0</p>
             </div>
-            <div class="glass-card p-4 flex flex-col justify-center items-center border-b-2 border-blue-500">
-                <p id="tpLabel" class="stat-label">Target TP Price</p>
-                <p id="finalTP" class="stat-value text-blue-400 text-2xl font-mono">0.00</p>
+            <div class="glass-card p-3 border-l-4 border-blue-500">
+                <p class="stat-label">Target TP Price</p>
+                <p id="finalTP" class="text-xl font-bold text-blue-400 font-mono text-center">0.00</p>
+            </div>
+            <div class="glass-card p-3 border-l-4 border-gray-500">
+                <p class="stat-label">Avg. Price (BE)</p>
+                <p id="finalBE" class="text-xl font-bold text-gray-300 font-mono text-center">0.00</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
             <div class="xl:col-span-3 space-y-4">
-                <div class="glass-card p-6 shadow-xl">
-                    <h2 class="text-md font-bold mb-4 flex items-center gap-2 text-indigo-400 uppercase tracking-tighter">
-                        🛠️ EA Parameter
+                <div class="glass-card p-5">
+                    <h2 class="text-sm font-bold mb-4 text-indigo-400 uppercase tracking-widest flex justify-between">
+                        EA Inputs <span>#GODMODE</span>
                     </h2>
                     <div class="space-y-3">
                         <div>
-                            <label class="stat-label">Account Balance ($)</label>
+                            <label class="stat-label">Balance ($)</label>
                             <input type="number" id="balance" value="1000" class="input-field" oninput="calculate()">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="stat-label">Entry Price</label>
-                                <input type="number" id="entryPrice" value="2300" class="input-field" oninput="calculate()">
-                            </div>
-                            <div>
-                                <label class="stat-label">Trade Side</label>
-                                <select id="direction" class="input-field" onchange="calculate()">
-                                    <option value="buy">BUY (ลากลง)</option>
-                                    <option value="sell">SELL (ลากขึ้น)</option>
-                                </select>
-                            </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -76,64 +70,47 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="stat-label">Grid Step (Pts)</label>
+                                <label class="stat-label">Base Step (Pts)</label>
                                 <input type="number" id="baseStep" value="700" class="input-field" oninput="calculate()">
                             </div>
                             <div>
-                                <label class="stat-label text-emerald-400">Target Profit ($)</label>
-                                <input type="number" id="targetProfit" value="5.0" step="0.5" class="input-field border-emerald-900" oninput="calculate()">
+                                <label class="stat-label text-emerald-400 font-bold">Profit Target ($)</label>
+                                <input type="number" id="targetProfit" value="5.0" step="1" class="input-field border-emerald-900" oninput="calculate()">
                             </div>
                         </div>
-                        
-                        <div class="pt-4 mt-4 border-t border-slate-800">
-                            <p class="stat-label mb-2 text-indigo-400 italic">Symbol Config</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="stat-label">Contract Size</label>
-                                    <input type="number" id="contractSize" value="100" class="input-field" oninput="calculate()">
-                                </div>
-                                <div>
-                                    <label class="stat-label">Point Size</label>
-                                    <input type="number" id="pointSize" value="0.01" step="0.001" class="input-field" oninput="calculate()">
-                                </div>
+                        <div class="pt-4 border-t border-slate-700">
+                            <label class="stat-label text-indigo-400">Spec (MT5)</label>
+                            <div class="grid grid-cols-2 gap-2 mt-1">
+                                <input type="number" id="contractSize" value="100" class="input-field" placeholder="CS" oninput="calculate()">
+                                <input type="number" id="pointSize" value="0.01" step="0.001" class="input-field" placeholder="Point" oninput="calculate()">
                             </div>
                         </div>
+                        <button onclick="resetPrices()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 py-2 rounded text-xs transition">Reset Manual Prices</button>
                     </div>
+                </div>
+                <div class="glass-card p-4 h-[200px]">
+                    <canvas id="lossChart"></canvas>
                 </div>
             </div>
 
-            <div class="xl:col-span-9 space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[300px]">
-                    <div class="glass-card p-4">
-                        <canvas id="lossChart"></canvas>
-                    </div>
-                    <div class="glass-card p-4 relative overflow-hidden flex flex-col justify-center items-center">
-                        <div id="retraceCircle" class="w-32 h-32 rounded-full border-8 border-indigo-500/20 flex items-center justify-center mb-2 transition-all duration-700">
-                            <span id="retracePercent" class="text-2xl font-bold">0%</span>
-                        </div>
-                        <p class="stat-label">Avg. Retrace Required</p>
-                        <p class="text-[10px] text-slate-500 mt-1 px-4 text-center">ต้องย่อตัวกลับมาเป็นกี่ % ของระยะที่โดนลากทั้งหมดเพื่อปิดกำไร</p>
-                    </div>
-                </div>
-
-                <div class="glass-card overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr>
-                                    <th>Order</th>
-                                    <th>Lot</th>
-                                    <th>Total Lot</th>
-                                    <th>Entry Price</th>
-                                    <th>Avg Price</th>
-                                    <th class="text-emerald-400">TP Price</th>
-                                    <th class="text-orange-400">Retrace (Pts)</th>
-                                    <th>Drawdown %</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody"></tbody>
-                        </table>
-                    </div>
+            <div class="xl:col-span-9 glass-card overflow-hidden">
+                <div class="overflow-x-auto h-[750px] overflow-y-auto">
+                    <table class="w-full">
+                        <thead class="sticky top-0 bg-[#0f172a] z-10">
+                            <tr>
+                                <th>#</th>
+                                <th>Lot</th>
+                                <th>Total</th>
+                                <th class="text-yellow-400">Entry Price (Edit)</th>
+                                <th>Avg Price (BE)</th>
+                                <th class="text-blue-400 italic">TP Price</th>
+                                <th class="text-slate-400">BE Retrace</th>
+                                <th class="text-emerald-400 font-bold">TP Retrace</th>
+                                <th>DD %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -141,135 +118,142 @@
 
     <script>
         let myChart;
+        let manualPrices = {}; // เก็บราคามือที่กรอกเอง
 
         function calculate() {
             const balance = parseFloat(document.getElementById('balance').value) || 0;
             const startLot = parseFloat(document.getElementById('startLot').value) || 0;
             const multiplier = parseFloat(document.getElementById('multiplier').value) || 0;
             const baseStep = parseFloat(document.getElementById('baseStep').value) || 0;
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value) || 0;
             const targetProfit = parseFloat(document.getElementById('targetProfit').value) || 0;
-            const direction = document.getElementById('direction').value;
             const contractSize = parseFloat(document.getElementById('contractSize').value) || 0;
             const pointSize = parseFloat(document.getElementById('pointSize').value) || 0;
-            
+            const direction = "buy"; // Dashboard นี้เน้น Buy ลากลง ถ้า Sell ให้จินตนาการกลับกันได้
+
             const pointValuePerLot = contractSize * pointSize;
 
             let tableBody = '';
             let totalLots = 0;
             let sumLotPrice = 0;
             let totalLoss = 0;
-            let currentDistance = 0;
-            let chartLabels = [];
+            let currentPrice = 0;
             let chartData = [];
-            
-            // ใช้สำหรับเก็บค่าไม้ล่าสุดที่ยังไม่ล้างพอร์ต
-            let lastSafeSurvival = 0;
-            let lastSafeTP = 0;
-            let lastSafeRetrace = 0;
-            let lastSafeRetracePercent = 0;
+
+            // เก็บผลลัพธ์ไม้ล่าสุดที่ยังไม่แตก
+            let lastSurvival = 0, lastTP = 0, lastBE = 0, lastRetraceTP = 0, lastRetraceBE = 0;
 
             for (let i = 1; i <= 30; i++) {
                 let currentLot = startLot * Math.pow(multiplier, i - 1);
                 currentLot = Math.round(currentLot * 100) / 100;
-                
+
+                // ตรวจสอบราคากรอกเอง
+                if (manualPrices[i]) {
+                    currentPrice = manualPrices[i];
+                } else {
+                    if (i === 1) {
+                        currentPrice = parseFloat(document.getElementById('entryPrice1')?.value) || 2300;
+                    } else {
+                        // คำนวณต่อจากไม้ก่อนหน้า
+                        currentPrice = currentPrice - (baseStep * pointSize);
+                    }
+                }
+
+                // คำนวณ Floating Loss (สำหรับสาย Martingale จริงๆ)
+                // เพื่อความง่าย: Loss = Sum of (Entry - Current) * Lots * CS
                 if (i > 1) {
-                    totalLoss += (totalLots * baseStep * pointValuePerLot);
-                    currentDistance += baseStep;
+                    // คำนวณการขาดทุนสะสม ณ จุดราคาปัจจุบัน
+                    totalLoss = 0;
+                    let tempTotalLots = 0;
+                    let tempSumPrice = 0;
+                    for(let j=1; j<=i; j++) {
+                        let jLot = startLot * Math.pow(multiplier, j - 1);
+                        jLot = Math.round(jLot * 100) / 100;
+                        let jPrice = manualPrices[j] || (j===1 ? (parseFloat(document.getElementById('entryPrice1')?.value) || 2300) : 0);
+                        // ถ้าไม้ j ไม่มีราคา ให้ใช้ราคา Auto
+                        if(jPrice === 0) jPrice = (parseFloat(document.getElementById('entryPrice1')?.value) || 2300) - ((j-1)*baseStep*pointSize);
+                        
+                        totalLoss += (jPrice - currentPrice) * jLot * contractSize;
+                        tempTotalLots += jLot;
+                        tempSumPrice += (jPrice * jLot);
+                    }
+                    totalLots = tempTotalLots;
+                    sumLotPrice = tempSumPrice;
+                } else {
+                    totalLots = currentLot;
+                    sumLotPrice = currentPrice * currentLot;
+                    totalLoss = 0;
                 }
-                
-                let currentEntryPrice = (direction === 'buy') ? entryPrice - (currentDistance * pointSize) : entryPrice + (currentDistance * pointSize);
-                
-                totalLots += currentLot;
-                totalLots = Math.round(totalLots * 100) / 100;
-                sumLotPrice += (currentLot * currentEntryPrice);
-                
-                // คำนวณจุดเสมอตัว (Average Price)
+
                 let avgPrice = sumLotPrice / totalLots;
-                
-                // คำนวณจุด TP (บวก/ลบ ระยะที่ทำให้ได้กำไร TargetProfit)
                 let pointsToTarget = targetProfit / (totalLots * pointValuePerLot);
-                let tpPrice = (direction === 'buy') ? avgPrice + (pointsToTarget * pointSize) : avgPrice - (pointsToTarget * pointSize);
-                
-                // ระยะย่อตัวจากราคาปัจจุบันไปถึง TP
-                let retracePts = Math.abs(currentEntryPrice - tpPrice) / pointSize;
-                let retracePct = currentDistance > 0 ? (retracePts / currentDistance * 100) : 0;
+                let tpPrice = avgPrice + (pointsToTarget * pointSize);
 
-                const ddPercent = balance > 0 ? (totalLoss / balance) * 100 : 0;
-                
+                let retraceBE = (avgPrice - currentPrice) / pointSize;
+                let retraceTP = (tpPrice - currentPrice) / pointSize;
+                const ddPercent = (totalLoss / balance) * 100;
+
+                chartData.push(totalLoss);
                 if (ddPercent <= 100) {
-                    lastSafeSurvival = currentDistance;
-                    lastSafeTP = tpPrice;
-                    lastSafeRetrace = retracePts;
-                    lastSafeRetracePercent = retracePct;
+                    lastSurvival = i; lastTP = tpPrice; lastBE = avgPrice;
+                    lastRetraceTP = retraceTP; lastRetraceBE = retraceBE;
                 }
 
-                chartLabels.push(`#${i}`);
-                chartData.push(totalLoss.toFixed(2));
-
-                const isDanger = ddPercent >= 80;
                 const rowClass = ddPercent >= 100 ? 'danger-zone' : '';
-
+                
                 tableBody += `
                     <tr class="${rowClass}">
-                        <td class="font-mono text-slate-500 font-bold">#${i}</td>
+                        <td>${i}</td>
                         <td class="font-bold">${currentLot.toFixed(2)}</td>
-                        <td>${totalLots.toFixed(2)}</td>
-                        <td class="font-mono text-slate-300">${currentEntryPrice.toFixed(pointSize.toString().length-2)}</td>
-                        <td class="font-mono text-slate-400">${avgPrice.toFixed(pointSize.toString().length-2)}</td>
-                        <td class="font-mono highlight-blue">${tpPrice.toFixed(pointSize.toString().length-2)}</td>
-                        <td class="font-mono text-orange-400">${Math.round(retracePts).toLocaleString()}</td>
-                        <td class="${isDanger ? 'text-red-500 font-bold' : 'text-emerald-500'}">${ddPercent.toFixed(1)}%</td>
+                        <td class="text-slate-400">${totalLots.toFixed(2)}</td>
+                        <td>
+                            <input type="number" step="0.01" 
+                                id="entryPrice${i}" 
+                                value="${currentPrice.toFixed(2)}" 
+                                onchange="updateManualPrice(${i}, this.value)"
+                                class="cell-input">
+                        </td>
+                        <td class="highlight-be">${avgPrice.toFixed(2)}</td>
+                        <td class="highlight-tp">${tpPrice.toFixed(2)}</td>
+                        <td class="text-slate-300 font-mono">${Math.round(retraceBE).toLocaleString()}</td>
+                        <td class="text-emerald-400 font-mono font-bold">${Math.round(retraceTP).toLocaleString()}</td>
+                        <td class="${ddPercent > 80 ? 'text-red-500 font-bold' : ''}">${ddPercent.toFixed(1)}%</td>
                     </tr>
                 `;
-
                 if (totalLoss > balance * 3) break;
             }
 
             document.getElementById('tableBody').innerHTML = tableBody;
-            document.getElementById('finalTP').innerText = lastSafeTP.toFixed(pointSize.toString().length-2);
-            document.getElementById('totalSurvival').innerText = lastSafeSurvival.toLocaleString();
-            document.getElementById('retraceNeeded').innerText = Math.round(lastSafeRetrace).toLocaleString();
-            document.getElementById('retracePercent').innerText = lastSafeRetracePercent.toFixed(1) + '%';
-            
-            // ปรับสีวงกลมตามความยากในการย่อตัว (ถ้าย่อเกิน 50% เริ่มยาก)
-            const retraceCircle = document.getElementById('retraceCircle');
-            if (lastSafeRetracePercent > 60) retraceCircle.style.borderColor = '#ef4444';
-            else if (lastSafeRetracePercent > 40) retraceCircle.style.borderColor = '#f59e0b';
-            else retraceCircle.style.borderColor = '#6366f1';
-
-            updateChart(chartLabels, chartData);
+            document.getElementById('totalSurvival').innerText = `ORD #${lastSurvival}`;
+            document.getElementById('retraceTP').innerText = Math.round(lastRetraceTP).toLocaleString();
+            document.getElementById('retraceBE').innerText = Math.round(lastRetraceBE).toLocaleString();
+            document.getElementById('finalTP').innerText = lastTP.toFixed(2);
+            document.getElementById('finalBE').innerText = lastBE.toFixed(2);
+            updateChart(chartData);
         }
 
-        function updateChart(labels, data) {
+        function updateManualPrice(idx, val) {
+            manualPrices[idx] = parseFloat(val);
+            calculate();
+        }
+
+        function resetPrices() {
+            manualPrices = {};
+            calculate();
+        }
+
+        function updateChart(data) {
             const ctx = document.getElementById('lossChart').getContext('2d');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Drawdown ($)',
-                        data: data,
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 2
-                    }]
+                    labels: data.map((_, i) => i + 1),
+                    datasets: [{ label: 'Drawdown ($)', data: data, borderColor: '#6366f1', borderWidth: 2, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)', tension: 0.3, pointRadius: 0 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { ticks: { color: '#475569', font: { size: 9 } }, grid: { color: '#1e293b' } } } }
             });
         }
+
         calculate();
     </script>
 </body>
