@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOD MODE EA - Risk Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d0d17; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { background-color: #131323; border: 1px solid #4646e6; border-top: 4px solid #4646e6; }
+        .input-field { background-color: #1a1a2e; border: 1px solid #3f3f5f; color: white; padding: 8px; border-radius: 4px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #181838; color: #a0a0ff; text-align: left; padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid #2a2a4a; }
+        tr:hover { background-color: #1c1c3c; }
+        .warning { color: #ff5050; font-weight: bold; }
+        .safe { color: #00dc78; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center text-blue-400">⚡ GOD MODE EA v2.0 Calculator</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card p-6 rounded-lg shadow-xl">
+                <h2 class="text-xl mb-4 border-b border-gray-700 pb-2 text-blue-300">⚙️ Settings</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm mb-1">Balance ($)</label>
+                        <input type="number" id="balance" value="1000" class="input-field" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Start Lot</label>
+                        <input type="number" id="startLot" value="0.01" step="0.01" class="input-field" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Multiplier</label>
+                        <input type="number" id="multiplier" value="1.3" step="0.1" class="input-field" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Base Step (Points)</label>
+                        <input type="number" id="baseStep" value="700" class="input-field" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Max Orders</label>
+                        <input type="number" id="maxOrders" value="20" class="input-field" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Point Value (1 Lot/1 Point)</label>
+                        <p class="text-xs text-gray-400 mb-1">ทองคำ (XAUUSD) ปกติคือ 1.0, Forex 5 จุดคือ 0.01-0.1</p>
+                        <input type="number" id="pointValue" value="1.0" step="0.1" class="input-field" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6 rounded-lg shadow-xl md:col-span-2 overflow-x-auto">
+                <h2 class="text-xl mb-4 border-b border-gray-700 pb-2 text-blue-300">📊 Risk Analysis</h2>
+                <div id="results">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Lot Size</th>
+                                <th>Total Lot</th>
+                                <th>Distance (Pts)</th>
+                                <th>Floating Loss</th>
+                                <th>Drawdown %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const balance = parseFloat(document.getElementById('balance').value);
+            const startLot = parseFloat(document.getElementById('startLot').value);
+            const multiplier = parseFloat(document.getElementById('multiplier').value);
+            const baseStep = parseFloat(document.getElementById('baseStep').value);
+            const maxOrders = parseInt(document.getElementById('maxOrders').value);
+            const pointValue = parseFloat(document.getElementById('pointValue').value);
+
+            let tableBody = '';
+            let totalLots = 0;
+            let totalLoss = 0;
+            let currentDistance = 0;
+
+            for (let i = 1; i <= maxOrders; i++) {
+                // คำนวณ Lot ไม้นี้
+                let currentLot = startLot * Math.pow(multiplier, i - 1);
+                currentLot = Math.round(currentLot * 100) / 100;
+                
+                // ก่อนจะเปิดไม้ถัดไป ไม้เดิมลากมาแล้ว BaseStep
+                if (i > 1) {
+                    totalLoss += (totalLots * baseStep * pointValue);
+                    currentDistance += baseStep;
+                }
+                
+                totalLots += currentLot;
+                totalLots = Math.round(totalLots * 100) / 100;
+                
+                const ddPercent = (totalLoss / balance) * 100;
+                const statusClass = ddPercent > 80 ? 'warning' : (ddPercent > 30 ? 'text-yellow-500' : 'safe');
+
+                tableBody += `
+                    <tr class="${ddPercent > 100 ? 'bg-red-900/20' : ''}">
+                        <td>#${i}</td>
+                        <td>${currentLot.toFixed(2)}</td>
+                        <td>${totalLots.toFixed(2)}</td>
+                        <td>${currentDistance.toLocaleString()}</td>
+                        <td class="${statusClass}">-$${totalLoss.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="${statusClass}">${ddPercent.toFixed(2)}%</td>
+                    </tr>
+                `;
+
+                if (totalLoss > balance * 1.5) break; // หยุดคำนวณถ้าพอร์ตระเบิดไปไกลแล้ว
+            }
+            document.getElementById('tableBody').innerHTML = tableBody;
+        }
+
+        // Run once on load
+        calculate();
+    </script>
+</body>
+</html>
