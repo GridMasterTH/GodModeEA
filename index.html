@@ -3,131 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOD MODE EA - Risk Calculator</title>
+    <title>GOD MODE EA - Pro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #0d0d17; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
-        .card { background-color: #131323; border: 1px solid #4646e6; border-top: 4px solid #4646e6; }
-        .input-field { background-color: #1a1a2e; border: 1px solid #3f3f5f; color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 14px; }
-        .input-field:focus { border-color: #6366f1; outline: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 700px; }
-        th { background-color: #181838; color: #a0a0ff; text-align: left; padding: 12px; font-size: 13px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #2a2a4a; font-size: 14px; }
-        tr:hover { background-color: #1c1c3c; }
-        .warning { color: #ff5050; font-weight: bold; }
-        .safe { color: #00dc78; }
-        .label-text { display: block; font-size: 12px; margin-bottom: 4px; color: #94a3b8; }
-        .blown-row { background-color: rgba(127, 29, 29, 0.4) !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { background-color: #05050f; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; }
+        .input-field { background: #0f172a; border: 1px solid #334155; color: #f1f5f9; padding: 12px; border-radius: 8px; width: 100%; transition: all 0.3s; }
+        .input-field:focus { border-color: #6366f1; ring: 2px solid #6366f1; outline: none; }
+        .stat-label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        th { text-transform: uppercase; font-size: 0.7rem; color: #94a3b8; padding: 12px; border-bottom: 2px solid #334155; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.875rem; }
+        .danger-zone { background: rgba(239, 68, 68, 0.15) !important; color: #fca5a5; }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-center text-blue-400">⚡ GOD MODE EA v2.0 Calculator</h1>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="card p-6 rounded-lg shadow-2xl lg:col-span-1">
-                <h2 class="text-xl mb-4 border-b border-gray-700 pb-2 text-blue-300">⚙️ Settings</h2>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="label-text">Balance ($)</label>
-                        <input type="number" id="balance" value="1000" class="input-field" oninput="calculate()">
-                    </div>
+<body class="p-6">
+    <div class="max-w-[1600px] mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
+                    ⚡ GOD MODE EA <span class="text-white font-light text-xl">PRO DASHBOARD</span>
+                </h1>
+                <p class="text-slate-400 text-sm">Advanced Risk & Survival Analysis for Grid Trading</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="glass-card px-6 py-3 text-center">
+                    <p class="stat-label">Survival Points</p>
+                    <p id="totalSurvival" class="text-emerald-400 font-mono text-xl">0</p>
+                </div>
+                <div class="glass-card px-6 py-3 text-center border-l-4 border-red-500">
+                    <p class="stat-label">Liquidation Price</p>
+                    <p id="liqPrice" class="text-red-400 font-mono text-xl">0.00</p>
+                </div>
+            </div>
+        </div>
 
-                    <div class="pt-2 border-t border-gray-800">
-                        <label class="label-text font-bold text-yellow-500">Price & Direction</label>
-                        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            <div class="xl:col-span-3 space-y-6">
+                <div class="glass-card p-6 shadow-xl">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>⚙️</span> Configuration
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="stat-label">Account Balance ($)</label>
+                            <input type="number" id="balance" value="1000" class="input-field" oninput="calculate()">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="label-text">Entry Price</label>
-                                <input type="number" id="entryPrice" value="2300" step="0.01" class="input-field" oninput="calculate()">
+                                <label class="stat-label">Entry Price</label>
+                                <input type="number" id="entryPrice" value="2300" class="input-field" oninput="calculate()">
                             </div>
                             <div>
-                                <label class="label-text">Direction</label>
+                                <label class="stat-label">Side</label>
                                 <select id="direction" class="input-field" onchange="calculate()">
-                                    <option value="buy">BUY (ลากลง)</option>
-                                    <option value="sell">SELL (ลากขึ้น)</option>
+                                    <option value="buy font-bold text-green-400">BUY</option>
+                                    <option value="sell font-bold text-red-400">SELL</option>
                                 </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="label-text">Start Lot</label>
-                            <input type="number" id="startLot" value="0.01" step="0.01" class="input-field" oninput="calculate()">
-                        </div>
-                        <div>
-                            <label class="label-text">Multiplier</label>
-                            <input type="number" id="multiplier" value="1.3" step="0.1" class="input-field" oninput="calculate()">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="label-text">Base Step (Points)</label>
-                        <input type="number" id="baseStep" value="700" class="input-field" oninput="calculate()">
-                    </div>
-                    <div>
-                        <label class="label-text">Max Orders</label>
-                        <input type="number" id="maxOrders" value="20" class="input-field" oninput="calculate()">
-                    </div>
-
-                    <div class="pt-4 border-t border-gray-800">
-                        <p class="text-xs text-blue-400 mb-2 font-bold">MT5 Specification:</p>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="label-text text-xs">Contract Size</label>
-                                <input type="number" id="contractSize" value="100" class="input-field" oninput="calculate()">
+                                <label class="stat-label">Start Lot</label>
+                                <input type="number" id="startLot" value="0.01" step="0.01" class="input-field" oninput="calculate()">
                             </div>
                             <div>
-                                <label class="label-text text-xs">Point Size</label>
-                                <input type="number" id="pointSize" value="0.01" step="0.001" class="input-field" oninput="calculate()">
+                                <label class="stat-label">Multiplier</label>
+                                <input type="number" id="multiplier" value="1.3" step="0.1" class="input-field" oninput="calculate()">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="stat-label">Grid Step (Points)</label>
+                            <input type="number" id="baseStep" value="700" class="input-field" oninput="calculate()">
+                        </div>
+                        <div class="pt-4 mt-4 border-t border-slate-700">
+                            <p class="stat-label mb-2 text-indigo-400 italic">Symbol Spec (MT5)</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="stat-label">Contract Size</label>
+                                    <input type="number" id="contractSize" value="100" class="input-field" oninput="calculate()">
+                                </div>
+                                <div>
+                                    <label class="stat-label">Point Size</label>
+                                    <input type="number" id="pointSize" value="0.01" step="0.001" class="input-field" oninput="calculate()">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card p-6 rounded-lg shadow-2xl lg:col-span-3 overflow-x-auto">
-                <h2 class="text-xl mb-4 border-b border-gray-700 pb-2 text-blue-300">📊 Risk Analysis</h2>
-                <div id="results">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Order</th>
-                                <th>Lot Size</th>
-                                <th>Total Lot</th>
-                                <th>Price Level</th>
-                                <th>Distance</th>
-                                <th>Floating Loss</th>
-                                <th>Drawdown %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
+            <div class="xl:col-span-9 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[350px]">
+                    <div class="glass-card p-6">
+                        <canvas id="lossChart"></canvas>
+                    </div>
+                    <div class="glass-card p-6 flex flex-col justify-center">
+                        <h3 class="stat-label mb-4 text-center">Safety Distribution</h3>
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <div><span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-200 bg-blue-600">Drawdown Risk</span></div>
+                                <div class="text-right"><span id="riskPercent" class="text-xs font-semibold inline-block text-blue-200">0%</span></div>
+                            </div>
+                            <div class="overflow-hidden h-4 mb-4 text-xs flex rounded-full bg-slate-700">
+                                <div id="riskBar" style="width:0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-red-500 transition-all duration-500"></div>
+                            </div>
+                        </div>
+                        <p id="safetyMsg" class="text-sm text-center text-slate-400 mt-2">พอร์ตของคุณยังอยู่ในโซนปลอดภัย</p>
+                    </div>
+                </div>
+
+                <div class="glass-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Lot Size</th>
+                                    <th>Total Lot</th>
+                                    <th>Target Price</th>
+                                    <th>Distance</th>
+                                    <th>Float Loss</th>
+                                    <th>DD %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        let myChart;
+
         function calculate() {
             const balance = parseFloat(document.getElementById('balance').value) || 0;
             const startLot = parseFloat(document.getElementById('startLot').value) || 0;
             const multiplier = parseFloat(document.getElementById('multiplier').value) || 0;
             const baseStep = parseFloat(document.getElementById('baseStep').value) || 0;
-            const maxOrders = parseInt(document.getElementById('maxOrders').value) || 0;
             const entryPrice = parseFloat(document.getElementById('entryPrice').value) || 0;
             const direction = document.getElementById('direction').value;
-            
             const contractSize = parseFloat(document.getElementById('contractSize').value) || 0;
             const pointSize = parseFloat(document.getElementById('pointSize').value) || 0;
+            
             const pointValuePerLot = contractSize * pointSize;
 
             let tableBody = '';
             let totalLots = 0;
             let totalLoss = 0;
             let currentDistance = 0;
+            let chartLabels = [];
+            let chartData = [];
+            let liqPriceValue = 0;
+            let survivalPoints = 0;
 
-            for (let i = 1; i <= maxOrders; i++) {
+            for (let i = 1; i <= 30; i++) {
                 let currentLot = startLot * Math.pow(multiplier, i - 1);
                 currentLot = Math.round(currentLot * 100) / 100;
                 
@@ -139,34 +173,80 @@
                 totalLots += currentLot;
                 totalLots = Math.round(totalLots * 100) / 100;
                 
-                // คำนวณราคาที่ตำแหน่งไม้นั้นๆ
-                let currentPrice;
-                if (direction === 'buy') {
-                    currentPrice = entryPrice - (currentDistance * pointSize);
-                } else {
-                    currentPrice = entryPrice + (currentDistance * pointSize);
+                let currentPrice = (direction === 'buy') ? entryPrice - (currentDistance * pointSize) : entryPrice + (currentDistance * pointSize);
+                const ddPercent = balance > 0 ? (totalLoss / balance) * 100 : 0;
+                
+                if (ddPercent <= 100) {
+                    liqPriceValue = currentPrice;
+                    survivalPoints = currentDistance;
                 }
 
-                const ddPercent = balance > 0 ? (totalLoss / balance) * 100 : 0;
-                const isBlown = ddPercent >= 100;
-                const statusClass = ddPercent > 80 ? 'warning' : (ddPercent > 30 ? 'text-yellow-500' : 'safe');
+                chartLabels.push(`#${i}`);
+                chartData.push(totalLoss.toFixed(2));
+
+                const isDanger = ddPercent >= 80;
+                const rowClass = ddPercent >= 100 ? 'danger-zone' : '';
 
                 tableBody += `
-                    <tr class="${isBlown ? 'blown-row' : ''}">
-                        <td class="font-bold text-gray-400">#${i}</td>
-                        <td>${currentLot.toFixed(2)}</td>
+                    <tr class="${rowClass}">
+                        <td class="font-mono text-slate-500">ORD-${i.toString().padStart(2, '0')}</td>
+                        <td class="font-bold">${currentLot.toFixed(2)}</td>
                         <td>${totalLots.toFixed(2)}</td>
-                        <td class="text-blue-200 font-mono">${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 3})}</td>
-                        <td>${currentDistance.toLocaleString()} pts</td>
-                        <td class="${statusClass}">-$${totalLoss.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                        <td class="${statusClass}">${ddPercent.toFixed(2)}%</td>
+                        <td class="text-indigo-300 font-mono">${currentPrice.toFixed(2)}</td>
+                        <td>${currentDistance.toLocaleString()} <span class="text-[10px] text-slate-500">pts</span></td>
+                        <td class="${isDanger ? 'text-red-400 font-bold' : ''}">-$${totalLoss.toLocaleString()}</td>
+                        <td class="${isDanger ? 'text-red-500 font-bold' : 'text-emerald-400'}">${ddPercent.toFixed(1)}%</td>
                     </tr>
                 `;
 
-                if (totalLoss > balance * 3) break; 
+                if (totalLoss > balance * 2.5) break;
             }
+
             document.getElementById('tableBody').innerHTML = tableBody;
+            document.getElementById('liqPrice').innerText = liqPriceValue.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('totalSurvival').innerText = survivalPoints.toLocaleString() + ' Pts';
+            
+            const maxDD = (chartData[chartData.length-1] / balance * 100);
+            document.getElementById('riskPercent').innerText = Math.min(maxDD, 100).toFixed(1) + '%';
+            document.getElementById('riskBar').style.width = Math.min(maxDD, 100) + '%';
+
+            updateChart(chartLabels, chartData);
         }
+
+        function updateChart(labels, data) {
+            const ctx = document.getElementById('lossChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Floating Loss ($)',
+                        data: data,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
         calculate();
     </script>
 </body>
